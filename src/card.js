@@ -535,6 +535,8 @@ export class WeekPlannerCard extends LitElement {
         return html`
             ${dayEvents.map((event) => {
                 const doneColors = [event.colors[0]];
+                const eventBackgroundStyle = this._useEventColors ? `--event-background-color: ${event.colors[0]};` : '';
+                const eventTextStyle = event.textColor ? `--event-text-color: ${event.textColor};` : '';
                 return html`
                     <div
                         class="event ${event.class}"
@@ -546,7 +548,7 @@ export class WeekPlannerCard extends LitElement {
                         data-start-minute="${event.start.toFormat('mm')}"
                         data-end-hour="${event.end.toFormat('H')}"
                         data-end-minute="${event.end.toFormat('mm')}"
-                        style="--border-color: ${event.colors[0]}"
+                        style="--border-color: ${event.colors[0]}; ${eventBackgroundStyle} ${eventTextStyle}"
                         @click="${() => {
                             this._handleEventClick(event)
                         }}"
@@ -926,10 +928,14 @@ export class WeekPlannerCard extends LitElement {
         }
 
         const eventColor = this._getEventColor(event, calendar);
+        const eventTextColor = this._getEventTextColor(event);
 
         if (this._calendarEvents.hasOwnProperty(eventKey)) {
             this._calendarEvents[eventKey].calendars.push(calendar.entity);
             this._calendarEvents[eventKey].colors.push(eventColor);
+            if (!this._calendarEvents[eventKey].textColor && eventTextColor) {
+                this._calendarEvents[eventKey].textColor = eventTextColor;
+            }
             if (calendar.name && this._calendarEvents[eventKey].calendarNames.indexOf(calendar.name) === -1) {
                 this._calendarEvents[eventKey].calendarNames.push(calendar.name);
             }
@@ -948,6 +954,7 @@ export class WeekPlannerCard extends LitElement {
                 fullDay: fullDay,
                 multiDay: multiDay,
                 colors: [eventColor],
+                textColor: eventTextColor,
                 icon: calendar.icon ?? null,
                 calendars: [calendar.entity],
                 calendarSorting: calendar.sorting,
@@ -966,6 +973,13 @@ export class WeekPlannerCard extends LitElement {
             }
         }
         return calendar.color ?? 'inherit';
+    }
+
+    _getEventTextColor(event) {
+        if (!this._useEventColors) {
+            return null;
+        }
+        return event.foreground_color ?? event.foregroundColor ?? event.textColor ?? null;
     }
 
     _filterEventSummary(event, calendar) {

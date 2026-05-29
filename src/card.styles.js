@@ -216,6 +216,7 @@ export default css`
 
     .container .day .events .event {
         display: flex;
+        color: var(--event-text-color, inherit);
         border-left: var(--event-border-width) solid var(--border-color, var(--divider-color, #ffffff));
         cursor: pointer;
     }
