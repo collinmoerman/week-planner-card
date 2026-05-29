@@ -384,9 +384,18 @@ export class WeekPlannerCard extends LitElement {
                     <li @click="${this._handleNavigationOriginalClick}"><ha-icon icon="mdi:circle-medium"></ha-icon></li>
                     <li @click="${this._handleNavigationNextClick}"><ha-icon icon="mdi:arrow-right"></ha-icon></li>
                 </ul>
-                <div class="month">${this._startDate.toFormat('MMMM')}</div>
+                <div class="month">${this._getNavigationTitle()}</div>
             </div>
         `;
+    }
+
+    _getNavigationTitle() {
+        if (!this._numberOfDaysIsMonth && [14, 28].includes(this._numberOfDays)) {
+            const endDate = this._startDate.plus({ days: this._numberOfDays - 1 });
+            return `${this._startDate.toFormat('MMMM d')} - ${endDate.toFormat('MMMM d')}`;
+        }
+
+        return this._startDate.toFormat('MMMM');
     }
 
     _renderWeekDays() {
