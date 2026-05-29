@@ -186,6 +186,7 @@ export class WeekPlannerCardEditor extends LitElement {
                     html`
                         ${this.addBooleanField('noCardBackground', 'No card background')}
                         ${this.addTextField('eventBackground', 'Override events background color')}
+                        ${this.addBooleanField('useEventColors', 'Use event colors')}
                         ${this.addBooleanField('compact', 'Compact mode')}
                     `
                 )}

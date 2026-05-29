@@ -62,6 +62,7 @@ export class WeekPlannerCard extends LitElement {
     _updateInterval;
     _noCardBackground;
     _eventBackground;
+    _useEventColors;
     _compact;
     _language;
     _weather;
@@ -177,6 +178,7 @@ export class WeekPlannerCard extends LitElement {
         this._updateInterval = config.updateInterval ?? 60;
         this._noCardBackground = config.noCardBackground ?? false;
         this._eventBackground = config.eventBackground ?? 'var(--card-background-color, inherit)';
+        this._useEventColors = config.useEventColors ?? false;
         this._compact = config.compact ?? false;
         this._dayFormat = config.dayFormat ?? null;
         this._dateFormat = config.dateFormat ?? 'cccc d LLLL yyyy';
@@ -923,9 +925,11 @@ export class WeekPlannerCard extends LitElement {
             eventKey = startDate.toISO() + '-' + endDate.toISO() + '-' + title + '-' + calendar.entity;
         }
 
+        const eventColor = this._getEventColor(event, calendar);
+
         if (this._calendarEvents.hasOwnProperty(eventKey)) {
             this._calendarEvents[eventKey].calendars.push(calendar.entity);
-            this._calendarEvents[eventKey].colors.push(calendar.color ?? 'inherit')
+            this._calendarEvents[eventKey].colors.push(eventColor);
             if (calendar.name && this._calendarEvents[eventKey].calendarNames.indexOf(calendar.name) === -1) {
                 this._calendarEvents[eventKey].calendarNames.push(calendar.name);
             }
@@ -943,7 +947,7 @@ export class WeekPlannerCard extends LitElement {
                 originalEnd: this._convertApiDate(event.end),
                 fullDay: fullDay,
                 multiDay: multiDay,
-                colors: [calendar.color ?? 'inherit'],
+                colors: [eventColor],
                 icon: calendar.icon ?? null,
                 calendars: [calendar.entity],
                 calendarSorting: calendar.sorting,
@@ -952,6 +956,16 @@ export class WeekPlannerCard extends LitElement {
             }
             this._events[dateKey].push(eventKey);
         }
+    }
+
+    _getEventColor(event, calendar) {
+        if (this._useEventColors) {
+            const eventColor = event.background_color ?? event.backgroundColor ?? event.color;
+            if (eventColor) {
+                return eventColor;
+            }
+        }
+        return calendar.color ?? 'inherit';
     }
 
     _filterEventSummary(event, calendar) {
